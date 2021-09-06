@@ -2,7 +2,6 @@ from qiskit import QuantumCircuit, assemble, Aer, transpile
 from qiskit.visualization import plot_histogram
 import matplotlib.pyplot as plt
 import numpy as np
-from qiskit_textbook.problems import dj_problem_oracle
 
 
 
@@ -59,7 +58,7 @@ def test_intro():       # an introductory test of qiskit
     plot_histogram(counts)
     plt.show()
 
-def dj_algorithm(n, oracle_n):         # implements the Deutsch-Jozsa algorithm
+'''def dj_algorithm(n, oracle_n):         # implements the Deutsch-Jozsa algorithm
     oracle = dj_problem_oracle(oracle_n)    # the constant/balanced oracle to be used
     qc = QuantumCircuit(n+1, n)     # the quantum circuit
     # First, apply H gate on the first n qubits to create an equal superposition
@@ -98,14 +97,14 @@ def dj_algorithm(n, oracle_n):         # implements the Deutsch-Jozsa algorithm
 
     qc.draw()
     plt.show()
-
+'''
 
     
 
 
 
 def main():
-    dj_algorithm(4, 2)
+    test_intro()
 
 
 
