@@ -62,9 +62,38 @@ def oracle_circuit(input_vector):
 
         return QRAM_circ
     
-    qr = QRAM()
-    #oracle.mcx(list(range(n)), n)
-    return qr, m, n
+
+    def VC():       # internal function to create the verification circuit, adding the extra pi phase to
+                    # solution address states
+        q_val = QuantumRegister(m, name='val')
+        q_p = QuantumRegister(1, name='p')            
+        VC_circ = QuantumCircuit(q_val, q_p)
+
+        # First, check if the bitstring is alternating
+        for i in range(m-1):
+            VC_circ.cx(q_val[i+1], q_val[i])
+        
+        # Then, add |1> to phase qubit if it's alternating, completing the phase kickback
+        VC_circ.x(q_p[0])
+        VC_circ.h(q_p[0])
+        VC_circ.mcx(list(range(m-1)), q_p[0])
+
+        return VC_circ
+    
+
+    vc = VC()
+    qram = QRAM()
+    qram.add_register(QuantumRegister(1, name='p'))
+    qram.barrier()
+    n_qubits = qram.num_qubits
+    oracle = qram.compose(vc, list(range(n_qubits - m - 1, n_qubits)))
+    oracle.draw()
+    plt.savefig('oracle.svg')
+
+    return oracle, m, n
+
+
+
 
 # returns the bitstring stored in this address
 def QRAM_test(address, oracle, m, n):
@@ -93,21 +122,26 @@ def QRAM_test(address, oracle, m, n):
         counts = sim.run(tcirc).result().get_counts()
         print(counts)
         quit()'''
+    
+    reg = QuantumRegister(1)
+    qc.add_register(reg)
+    qc.h(reg[0])
     qc.measure(list(range(n_qubits-m, n_qubits)), list(range(m)))
 
-    #qc.draw()
-    #plt.show()
-    sim = AerSimulator(method='statevector')
+    qc.draw()
+    plt.savefig('test_circuit.svg')
+    sim = AerSimulator(method='statevector', precision='single')
     # DO NOT use the matrix_product_state simulator!!!
-    tcirc = transpile(qc, sim)
-    counts = sim.run(tcirc).result().get_counts()
+    qc = transpile(qc, sim)
+    result = sim.run(qc, shots=8000).result()
+    counts = result.get_counts()
     print(counts)
 
 
 # used to test the mysterious bit-flip bug
 # confirmed: bug is caused by the matrix_product_state simulator
 # confirmed to be bug-free
-def QRAM_debug(input_vector, results):
+'''def QRAM_debug(input_vector, results):
     n = len(input_vector)
     for i in range(n):
         true_value = input_vector[i]
@@ -118,19 +152,39 @@ def QRAM_debug(input_vector, results):
         for j in range(len(xor_bitstring)):
             if xor_bitstring[j] == '1':
                 flipped_bits.append(j)
-        print("Position {}, flipped bits: ".format(i), flipped_bits)
+        print("Position {}, flipped bits: ".format(i), flipped_bits)'''
+
+
+# used to test the verification circuit
+'''def VC_test(vc, m, n):
+    vc_prep = QuantumCircuit(m+1)
+    for i in range(m):
+        vc_prep.h(i) 
+    vc = vc_prep.compose(vc)
+    vc.save_statevector()
+    vc.draw()
+    plt.savefig('vc.svg')
+
+    sim = AerSimulator(method='statevector', precision='single')
+    vc = transpile(vc, sim)
+    result = sim.run(vc, shots=4000).result()
+    state = result.get_statevector()
+    print(list(state))'''
+
+
 
 
 
 
 
 if __name__ == '__main__':
-    input_vector = list([1, 5, 7, 10]) 
+    input_vector = list([0, 1, 2, 4, 8, 12, 16, 31]) 
     results = []
     oracle, m, n = oracle_circuit(input_vector)
     # oracle.draw()
     # plt.savefig('QRAM circuit.svg')
-    QRAM_test(0, oracle, m, n)
+    # QRAM_test(0, oracle, m, n)
+    # VC_test(vc, m, n)
 
     '''for i in range(len(input_vector)):
         results += QRAM_test(i, oracle, m, n)
