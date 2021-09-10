@@ -1,5 +1,8 @@
 '''
-This file implements the phase oracle used in Task 1. 
+This file implements the phase oracle used in Task 1. The effect of this circuit is to reflect
+the input state about state |w'>, the state orthogonal to the state |w>, an equal superposition of all
+solution states. In other words, it adds a pi phase to each basis state corresponding to an
+alternating bitstring in the input vector.
 '''
 
 
@@ -80,7 +83,7 @@ def oracle_circuit(input_vector):
 
         return VC_circ
     
-
+    # Here we connect QRAM and VC together
     vc = VC()
     qram = QRAM()
     qram.add_register(QuantumRegister(1, name='p'))
