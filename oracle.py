@@ -91,6 +91,7 @@ def oracle_circuit(input_vector):
     n_qubits = qram.num_qubits
     oracle = qram.compose(vc, list(range(n_qubits - m - 1, n_qubits)))
     oracle.draw()
+    plt.title('The oracle circuit, for input vector ' + str(input_vector))
     plt.savefig('oracle.svg')
 
     return oracle, m, n
