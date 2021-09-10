@@ -92,7 +92,7 @@ def oracle_circuit(input_vector):
     oracle = qram.compose(vc, list(range(n_qubits - m - 1, n_qubits)))
     oracle.draw()
     plt.title('The oracle circuit, for input vector ' + str(input_vector))
-    plt.savefig('oracle.svg')
+    plt.savefig('.\circuit_diagrams\oracle.svg')
 
     return oracle, m, n
 
@@ -132,8 +132,8 @@ def QRAM_test(address, oracle, m, n):
     qc.h(reg[0])
     qc.measure(list(range(n_qubits-m, n_qubits)), list(range(m)))
 
-    qc.draw()
-    plt.savefig('test_circuit.svg')
+    # qc.draw()
+    # plt.savefig('test_circuit.svg')
     sim = AerSimulator(method='statevector', precision='single')
     # DO NOT use the matrix_product_state simulator!!!
     qc = transpile(qc, sim)

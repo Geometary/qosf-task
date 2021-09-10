@@ -42,7 +42,7 @@ def diffuser_circuit(n):
     
     DF_circ.draw()
     plt.title("The diffuser circuit, with {} address qubits".format(n))
-    plt.savefig('diffuser.svg')
+    plt.savefig('.\circuit_diagrams\diffuser.svg')
     return DF_circ
 
 
