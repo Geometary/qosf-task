@@ -86,7 +86,7 @@ def oracle_circuit(input_vector):
     # Here we connect QRAM and VC together
     vc = VC()
     qram = QRAM()
-    qram.add_register(QuantumRegister(1, name='p'))
+    qram.add_register(QuantumRegister(1, name='p'))     # This is the phase qubit
     qram.barrier()
     n_qubits = qram.num_qubits
     oracle = qram.compose(vc, list(range(n_qubits - m - 1, n_qubits)))
@@ -100,7 +100,7 @@ def oracle_circuit(input_vector):
 
 
 # returns the bitstring stored in this address
-def QRAM_test(address, oracle, m, n):
+def oracle_test(address, oracle, m, n):
     # m is length of each bitstring stored, n is number of address qubits
     address_bitstring = list(format(address, 'b').zfill(n))
     address_bitstring.reverse()
@@ -126,16 +126,13 @@ def QRAM_test(address, oracle, m, n):
         counts = sim.run(tcirc).result().get_counts()
         print(counts)
         quit()'''
-    
-    reg = QuantumRegister(1)
-    qc.add_register(reg)
-    qc.h(reg[0])
-    qc.measure(list(range(n_qubits-m, n_qubits)), list(range(m)))
+    qc.measure(list(range(n_qubits-m-1, n_qubits-1)), list(range(m)))       # measures the value state
+                                                                            # after verification
 
-    # qc.draw()
-    # plt.savefig('test_circuit.svg')
-    sim = AerSimulator(method='statevector', precision='single')
-    # DO NOT use the matrix_product_state simulator!!!
+    qc.draw()
+    plt.savefig('test_circuit.svg')
+    sim = AerSimulator(method='statevector')
+    # DO NOT use the matrix_product_state simulator in any case!!!
     qc = transpile(qc, sim)
     result = sim.run(qc, shots=8000).result()
     counts = result.get_counts()
@@ -182,12 +179,12 @@ def QRAM_test(address, oracle, m, n):
 
 
 if __name__ == '__main__':
-    input_vector = list([0, 1, 2, 4, 8, 12, 16, 31]) 
+    input_vector = list([1, 5, 7, 10]) 
     results = []
     oracle, m, n = oracle_circuit(input_vector)
     # oracle.draw()
     # plt.savefig('QRAM circuit.svg')
-    # QRAM_test(0, oracle, m, n)
+    oracle_test(0, oracle, m, n)
     # VC_test(vc, m, n)
 
     '''for i in range(len(input_vector)):

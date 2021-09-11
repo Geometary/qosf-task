@@ -1,9 +1,10 @@
 from oracle import oracle_circuit
 from diffuser import diffuser_circuit
-from qiskit import QuantumCircuit, assemble, transpile, QuantumRegister, ClassicalRegister
+# from qiskit import QuantumCircuit, assemble, transpile, QuantumRegister, ClassicalRegister
+import from2to4 as dlc
 from qiskit.providers.aer import AerSimulator
-from qiskit.visualization import plot_histogram
-import matplotlib.pyplot as plt
+# from qiskit.visualization import plot_histogram
+# import matplotlib.pyplot as plt
 import numpy as np
 
 
