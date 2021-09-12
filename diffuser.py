@@ -41,19 +41,23 @@ def diffuser_circuit(n):
         DF_circ.h(l)
     
     DF_circ.draw()
-    plt.title("The diffuser circuit, with {} address qubits".format(n))
+    plt.title("The diffuser circuit, with {} address qubits; 'DIF' gate".format(n))
     plt.savefig('.\circuit_diagrams\diffuser.svg')
     return DF_circ
 
 
 # Accepts n as the number of address qubits and tests the diffuser circuit
 def DF_test(n):
+    initial_state = list(np.array([1, 1, -1, 1, 0, 0, 0, 0]) / 2)
     test_circ = QuantumCircuit(n+1)
+    test_circ.initialize(initial_state)
     test_circ.x(n)
-    test_circ.h(n)
+    test_circ.h(n)      # initialize the highest qubit to |->
     DF = diffuser_circuit(n)
     test_circ.barrier()
     qc = test_circ.compose(DF)
+    qc.draw()
+    plt.show()
     qc.save_statevector()
     
     sim = AerSimulator(method='statevector', precision='single')
@@ -64,5 +68,5 @@ def DF_test(n):
 
 
 if __name__ == '__main__':
-    n = 3
+    n = 2
     DF_test(n)
