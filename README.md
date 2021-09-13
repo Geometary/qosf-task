@@ -34,4 +34,4 @@
 
 3. This has successfully made the simulation for [1, 5, 7, 10] possible. Currently the result can be known through directly measuring the final address qubits (and the results are expected, measuring 01 and 11 both exactly half of the times), yet my PC still doesn't have enough memory to output the final statevector. I tried to lower the precision of the simulation in multiple ways, and the RAM of my PC is still a few GB short at the best. But with m=3 and an input vector like [1, 2, 5, 7], the final statevector can be correctly returned.
 
-4. For higher m and n, I currently do not have a better idea to lower the number of qubits needed for simulation purposes, but the simulation should still be able to output the right answer given enough RAM.
+4. For higher m and n, I currently do not have a better idea to lower the number of qubits needed for simulation purposes, but the program should still be able to output the correct circuit.
