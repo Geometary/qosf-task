@@ -1,7 +1,7 @@
 '''
 This file provides utility functions that modify the original Grover's circuit to dramatically improve
 the maximum m allowed in the simulation from 2 to 4, with n = 2. Using these utility functions, the size
-of the search space is no longer needed to be doubled for a length 4 input vector, in theory.
+of the search space is no longer needed to be doubled for a length 4 input vector.
 '''
 
 from qiskit import QuantumCircuit, assemble, transpile, QuantumRegister, ClassicalRegister
@@ -101,11 +101,17 @@ def improve(diffuser, qram, vc1, vc2, m):
     sup_2 = superpose_2().to_gate(label='SUP_2')
 
     # Now all components are ready.
-    # First, initialize two address states
+    # First, initialize two address states and two phase qubits
     qc.h(a[0])
     qc.h(a[1])
     qc.h(b[0])
     qc.h(b[1])
+
+    qc.x(j[0])
+    qc.x(j[1])
+    qc.h(j[0])
+    qc.h(j[1])
+
 
 
     # Second, connect QRAM, VC_1, another QRAM (to restore t register), and DIF for VC_1
@@ -129,9 +135,6 @@ def improve(diffuser, qram, vc1, vc2, m):
     # Finally, connect SUP_2
     qc.append(sup_2, [a[0], a[1], b[0], b[1], j[0], j[1]])
 
-    qc.draw()
-    plt.title("Overall circuit for n = 2, m = {}".format(m))
-    plt.savefig(".\circuit_diagrams\overall.svg")
 
     return qc
 

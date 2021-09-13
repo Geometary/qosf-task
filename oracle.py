@@ -16,8 +16,9 @@ import numpy as np
 
 
 # Input: input_vector, the initial input vector [1, 5, 7, 10] to determine m, n and initialize QRAM.
-# Output: oracle, a QuantumCircuit object for m+1 qubits, representing the quantum phase oracle
-#       that adds a phase of pi to solution states (with alternating bitstrings)
+# Output: 
+#   - if n = 2, returns a tuple consisting of QRAM, VC_1, VC_2, m, and n
+#   - otherwise, returns a tuple consisting of oracle, None, None, m, and n 
 def oracle_circuit(input_vector):
     n = int(np.log2(len(input_vector)))         # the number of address qubits
     m = int(np.log2(max(input_vector))) + 1     # the length of each bitstring, determined by the
@@ -77,7 +78,7 @@ def oracle_circuit(input_vector):
         QRAM_circ.cx(q_a[0], q_tau[1])
         QRAM_circ.x(q_tau[0])
 
-        # And also recover mem register
+        # And also recover m register
         for i in range(2**n):
             value = input_vector[i]
             value_bitstring = list(format(value, 'b').zfill(m))
@@ -100,7 +101,7 @@ def oracle_circuit(input_vector):
                         # designed to not change the state of value qubits
 
         q_val = QuantumRegister(m, name='val')      # value qubits
-        q_p = QuantumRegister(1, name='p')          # phase qubit 
+        q_p = QuantumRegister(1, name='p')          # phase qubit, already initialized to |-> 
         VC_circ = QuantumCircuit(q_val, q_p)
 
         # First, check if the bitstring is alternating
@@ -108,8 +109,6 @@ def oracle_circuit(input_vector):
             VC_circ.cx(q_val[i+1], q_val[i])
         
         # Then, add |1> to phase qubit if it's alternating, completing the phase kickback
-        VC_circ.x(q_p[0])
-        VC_circ.h(q_p[0])
         if type == 1:     # for VC_1, do the phase flip only for the solution starting with |0>
                             # (i.e. |0101010...>)
             VC_circ.x(q_val[m-1])
@@ -119,6 +118,7 @@ def oracle_circuit(input_vector):
                             # (i.e. |101010101...>)
             VC_circ.mcx(list(range(m)), q_p[0])
         else:
+            type = 0
             VC_circ.mcx(list(range(m - 1)), q_p[0])     # otherwise, do the flip for both solutions
         
         # Finally, recover the previous value state
@@ -132,17 +132,25 @@ def oracle_circuit(input_vector):
     
     if n == 2:      # in which case we assemble the components and
                     # go beyond the qubit limit
-        return QRAM(), VC(type=1), VC(type=2), m
+        return QRAM(), VC(type=1), VC(type=2), m, n
 
+    # Now we deal with the case n != 2
     # Here we connect QRAM and VC together
     vc = VC()
     qram = QRAM()
-    qram.add_register(QuantumRegister(1, name='p'))     # This is the phase qubit
-    qram.barrier()
-    n_qubits = qram.num_qubits
-    oracle = qram.compose(vc, list(range(n_qubits - m - 1, n_qubits)))
+    n_qubits = qram.num_qubits          # number of qubits used in QRAM
+    vc = vc.to_gate(label='VC_0')
+    qram = qram.to_gate(label='QRAM')
 
-    return oracle, m, n
+    oracle = QuantumCircuit(n_qubits + 1)       # since an extra phase qubit is needed for the oracle
+    oracle.append(qram, list(range(n_qubits)))    
+    oracle.append(vc, list(range(n_qubits - m, n_qubits + 1)))
+    oracle.append(qram, list(range(n_qubits)))  # append another QRAM to restore state of t/val register
+    oracle.draw()
+    plt.title("Circuit diagram of the oracle for input vector " + str(input_vector) + ", with m = {} and n = {}; 'ORACLE' gate".format(m, n))
+    plt.savefig('.\circuit_diagrams\oracle.svg')
+
+    return oracle, None, None, m, n
 
 
 
