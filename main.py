@@ -54,6 +54,7 @@ def Grovers_circuit(input_vector):
 # n_shots is the total number of experiments to be run if measurement is used
 def Grovers_test(input_vector, return_state=False, n_shots=8000):
     Grovers_circ, n = Grovers_circuit(input_vector)
+    print("Circuit generation complete.")
     num_q = Grovers_circ.num_qubits     # the total number of qubits of the overall circuit
     sim = AerSimulator(method='statevector', precision='single')
     if return_state:        # to directly return the final state
@@ -62,7 +63,7 @@ def Grovers_test(input_vector, return_state=False, n_shots=8000):
         result = sim.run(qc).result()
         state = result.get_statevector(decimals=3)
         reduced_dm = partial_trace(state, list(range(n, num_q)))    # only focus on the state of n address qubits
-        wanted_state = np.diagonal(reduced_dm)
+        wanted_state = np.sqrt(np.diagonal(reduced_dm))     # convert density matrix into statevector
         print("The final statevector is: " + str(wanted_state))
         print("The circuit diagram file is saved as .\circuit_diagrams\overall.svg")
     else:                   # to only measure the final state

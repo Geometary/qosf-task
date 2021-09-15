@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# returns a two-qubit circuit that do the transformation |b>|a> -> 1/sqrt(2) * (|a>+|b>)|a>
+# returns a two-qubit circuit that does the transformation |b>|a> -> 1/sqrt(2) * (|a>+|b>)|a>
 # in other words, it generates a equal superposition of two input states
-# |a> and |b> are guaranteed to be two Z basis states and are not the same state
+# |a> and |b> are guaranteed to be two different single-qubit Z basis states
 def superpose():
     a = QuantumRegister(1, name='a')
     b = QuantumRegister(1, name='b')
@@ -31,7 +31,7 @@ def superpose():
     return u
 
 
-# returns a 6-qubit circuit that do the transformation |j1>|j0>|b1>|b0>|a1>|a0> -> 1/sqrt(2) * |j1'>|j0'>(|a1a0>+|b1b0>)|a1a0>
+# returns a 6-qubit circuit that does the transformation |j1>|j0>|b1>|b0>|a1>|a0> -> 1/sqrt(2) * |j1'>|j0'>(|a1a0>+|b1b0>)|a1a0>
 # |a1a0> and |b1b0> are guaranteed to be two different two-qubit Z basis states
 def superpose_2():
     sup = superpose().to_gate(label='SUP')
@@ -83,14 +83,14 @@ def superpose_2():
 
 
 # Goes beyond the qubit limit for n = 2!
-# Returns the final QuantumCircuit to be used for simulating Task 1 with n = 2 and m < 5
+# Returns the final QuantumCircuit to be used for simulating Task 1 with n = 2
 def improve(diffuser, qram, vc1, vc2, m):
     print("n = 2 detected.")
     print("Let's go beyond the limit.")
     b = QuantumRegister(2, name='b')        # the answer state
     a = QuantumRegister(2, name='a')        # the other address state
-    tau = QuantumRegister(4, name='tau')    # anciliary qubit for QRAM
-    mem = QuantumRegister(4 * m, name='mem')    # memory qubits for QRAM
+    tau = QuantumRegister(4, name='tau')    # anciliary qubits for QRAM
+    mem = QuantumRegister(4 * m, name='m')    # memory qubits for QRAM
     t = QuantumRegister(m, name='t')        # value qubits
     j = QuantumRegister(2, name='j')    # phase qubits, judge qubits later
     qc = QuantumCircuit(b, a, tau, mem, t, j)

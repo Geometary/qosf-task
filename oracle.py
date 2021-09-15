@@ -98,7 +98,8 @@ def oracle_circuit(input_vector):
                         # solution address states
                         # There are 3 different types of VC, namely VC_0, VC_1, and VC_2
                         # since the value qubits need to be accessed twice for n = 2, the circuit is now 
-                        # designed to not change the state of value qubits
+                        # designed to not change the state of value qubits (which are connected to the
+                        # t register of QRAM)
 
         q_val = QuantumRegister(m, name='val')      # value qubits
         q_p = QuantumRegister(1, name='p')          # phase qubit, already initialized to |-> 
